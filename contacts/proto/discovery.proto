@@ -1,0 +1,13 @@
+service Contact {
+	rpc Discovery (DiscoveryRequest) returns (DiscoveryResponse);
+}
+
+message DiscoveryRequest {}
+
+message DiscoveryResponse {
+	map<string, Service> services = 1;
+	message Service {
+		optional string method = 2;
+		optional string description = 3;
+	}
+}
