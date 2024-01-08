@@ -1,0 +1,10 @@
+node_modules
+bin
+!bin/.gitkeep
+temp
+tmp
+dist
+build
+.env
+*.env.*
+!sample.env
