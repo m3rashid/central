@@ -55,8 +55,15 @@ func LoginWithPassword(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	addUserIDToCookie(ctx, user.ID)
+	addUserIDToCookie(ctx, user.ID) // do this after the consent
 	return ctx.Status(fiber.StatusOK).JSON(user)
+
+	// TODO: return the hypermedia content as a consent for the asked scopes
+	// ===== steps =====
+	// check the request's clientId and response_type,
+	// get the app's scope
+	// present with the consent screen to allow or deny
+	// preserve the app state
 }
 
 func Register(ctx *fiber.Ctx) error {
