@@ -1,8 +1,9 @@
 package controllers
 
 import (
+	"internal/discovery"
+
 	"github.com/gofiber/fiber/v2"
-	"github.com/m3rashid/central/internal/discovery"
 )
 
 var endpoints = discovery.ResourceServerDetails{

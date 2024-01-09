@@ -3,18 +3,32 @@ package controllers
 import (
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/m3rashid/central/auth/components"
 	"github.com/m3rashid/central/auth/models"
 	"github.com/m3rashid/central/auth/utils"
 )
 
+func RenderLoginScreen(ctx *fiber.Ctx) error {
+	ctx.Set("Content-Type", "text/html")
+	component := components.Consent()
+	return component.Render(ctx.Context(), ctx.Response().BodyWriter())
+}
+
 func LoginWithPassword(ctx *fiber.Ctx) error {
 	type Login struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
+		Email    string `json:"email" validate:"email,required"`
+		Password string `json:"password" validate:"required"`
 	}
 	var login Login
 	if err := ctx.BodyParser(&login); err != nil {
+		return err
+	}
+
+	validate := validator.New()
+	err := validate.Struct(login)
+	if err != nil {
 		return err
 	}
 

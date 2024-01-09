@@ -3,12 +3,12 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"internal/discovery"
 	"io"
 	"net/http"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/m3rashid/central/internal/discovery"
 )
 
 var resourceDiscoveryUrls = map[string]string{

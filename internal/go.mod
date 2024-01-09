@@ -1,3 +1,3 @@
-module github.com/m3rashid/central/internal
+module internal
 
 go 1.21.5
