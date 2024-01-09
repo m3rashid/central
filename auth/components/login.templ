@@ -33,11 +33,11 @@ templ LoginOrRegister (props LoginProps, client models.Client) {
 		<fluent-text-field type="password" appearance="outline" placeholder="shh ...)" name="password">Password</fluent-text-field>
 		<fluent-button appearance="accent" type="submit">Login</fluent-button>
 		if props.IsRegister {
-			<a href={ props.LoginEndpoint }>Account Not Listed here? Login</a>
+			<a href={ templ.SafeURL(props.LoginEndpoint) }>Account Not Listed here? Login</a>
 		} else {
-			<a href={ props.RegisterEndpoint }>Don't Have an account? Register</a>
+			<a href={ templ.SafeURL(props.RegisterEndpoint) }>Don't Have an account? Register</a>
 		}
-		<a href={ props.SelectUserEndpoint }>Already logged in? Select account</a>
+		<a href={ templ.SafeURL(props.SelectUserEndpoint) }>Already logged in? Select account</a>
 	}
 }
 
@@ -58,8 +58,8 @@ templ SelectUser (props SelectUserProps) {
 				</div>
 			}
 		</div>
-		<a href={ props.LoginEndpoint }>Account Not Listed here? Login</a>
-		<a href={ props.RegisterEndpoint }>Don't Have an account? Register</a>
+		<a href={ templ.SafeURL(props.LoginEndpoint) }>Account Not Listed here? Login</a>
+		<a href={ templ.SafeURL(props.RegisterEndpoint) }>Don't Have an account? Register</a>
 	}
 }
 
