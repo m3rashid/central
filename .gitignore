@@ -8,4 +8,3 @@ build
 .env
 *.env.*
 !sample.env
-*_templ.go
