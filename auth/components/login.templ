@@ -1,18 +1,73 @@
 package components
 
-templ Login (isRegister bool) {
+import "github.com/m3rashid/central/auth/models"
+
+templ cardContainer (client models.Client) {
 	@rootHTML() {
-		<div style="display:flex; align-items:center; justify-content:center; height:100vh">
-			<form id="consent-form">
-				<fluent-card style="width:320px; display:flex; flex-direction:column; gap:16px; padding: 64px 32px 64px 32px; height:min-content">
-				    if isRegister {
-				        <fluent-text-field appearance="outline" placeholder="User Name" name="name">Name</fluent-text-field>
-				    }
-					<fluent-text-field appearance="outline" placeholder="user@email.com" name="email">Email</fluent-text-field>
-					<fluent-text-field type="password" appearance="outline" placeholder="shh ...)" name="password">Password</fluent-text-field>
-					<fluent-button appearance="accent" type="submit">Login</fluent-button>
-				</fluent-card>
-			</form>
+		<div style="height:100vh" class="all-center">
+			<fluent-card style="width:320px; display:flex; flex-direction:column; gap:16px; padding: 64px 32px 64px 32px; height:min-content">
+				if client.AppLogoUrl != "" {
+					<img src={ client.AppLogoUrl } alt="app_logo"/>
+				}
+				if client.AppName != "" {
+					<h3>{ client.AppName }</h3>
+				}
+			</fluent-card>
 		</div>
+	}
+}
+
+type LoginProps struct {
+	IsRegister         bool
+	LoginEndpoint      string
+	RegisterEndpoint   string
+	SelectUserEndpoint string
+}
+
+templ LoginOrRegister (props LoginProps, client models.Client) {
+	@cardContainer(client) {
+		if props.IsRegister {
+			<fluent-text-field appearance="outline" placeholder="User Name" name="name">Name</fluent-text-field>
+		}
+		<fluent-text-field appearance="outline" placeholder="user@email.com" name="email">Email</fluent-text-field>
+		<fluent-text-field type="password" appearance="outline" placeholder="shh ...)" name="password">Password</fluent-text-field>
+		<fluent-button appearance="accent" type="submit">Login</fluent-button>
+		if props.IsRegister {
+			<a href={ props.LoginEndpoint }>Account Not Listed here? Login</a>
+		} else {
+			<a href={ props.RegisterEndpoint }>Don't Have an account? Register</a>
+		}
+		<a href={ props.SelectUserEndpoint }>Already logged in? Select account</a>
+	}
+}
+
+type SelectUserProps struct {
+	Users            []models.User
+	Client           models.Client
+	LoginEndpoint    string
+	RegisterEndpoint string
+}
+
+templ SelectUser (props SelectUserProps) {
+	@cardContainer(props.Client) {
+		<div style="display:flex; align-items:center; flex-firection:column; gap:16px">
+			for _, user := range props.Users {
+				<div style="display:flex;flex-direction:column;gap:2px">
+					<p>{ user.Name }</p>
+					<p>{ user.Email }</p>
+				</div>
+			}
+		</div>
+		<a href={ props.LoginEndpoint }>Account Not Listed here? Login</a>
+		<a href={ props.RegisterEndpoint }>Don't Have an account? Register</a>
+	}
+}
+
+templ FlowError (errors []string, client models.Client) {
+	@cardContainer(client) {
+		<h3>Error Occured</h3>
+		for _, err := range errors {
+			<div>{ err }</div>
+		}
 	}
 }

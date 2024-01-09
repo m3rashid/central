@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"errors"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/m3rashid/central/auth/components"
@@ -9,17 +11,60 @@ import (
 )
 
 func RenderLoginScreen(ctx *fiber.Ctx) error {
-	// TODO: handle additional request queries to revert back and state to preserve
 	ctx.Set("Content-Type", "text/html")
-	component := components.Login(false)
-	return component.Render(ctx.Context(), ctx.Response().BodyWriter())
+	client, flowQueries, err := getClient(ctx)
+	if err != nil {
+		return errorComponent(ctx, models.Client{}, errors.New("client not found"))
+	}
+
+	return components.LoginOrRegister(components.LoginProps{
+		IsRegister:         false,
+		LoginEndpoint:      setUrlWithFlowQueries("/login", flowQueries),
+		RegisterEndpoint:   setUrlWithFlowQueries("/register", flowQueries),
+		SelectUserEndpoint: setUrlWithFlowQueries("/select-user", flowQueries),
+	}, client).Render(ctx.Context(), ctx.Response().BodyWriter())
 }
 
 func RenderRegisterScreen(ctx *fiber.Ctx) error {
-	// TODO: handle additional request queries to revert back and state to preserve
 	ctx.Set("Content-Type", "text/html")
-	component := components.Login(true)
-	return component.Render(ctx.Context(), ctx.Response().BodyWriter())
+	client, flowQueries, err := getClient(ctx)
+	if err != nil {
+		return errorComponent(ctx, models.Client{}, errors.New("client not found"))
+	}
+
+	return components.LoginOrRegister(components.LoginProps{
+		IsRegister:         true,
+		LoginEndpoint:      setUrlWithFlowQueries("/login", flowQueries),
+		RegisterEndpoint:   setUrlWithFlowQueries("/register", flowQueries),
+		SelectUserEndpoint: setUrlWithFlowQueries("/select-user", flowQueries),
+	}, client).Render(ctx.Context(), ctx.Response().BodyWriter())
+}
+
+func RenderSelectUserScreen(ctx *fiber.Ctx) error {
+	ctx.Set("Content-Type", "text/html")
+	client, flowQueries, err := getClient(ctx)
+	if err != nil {
+		return errorComponent(ctx, models.Client{}, errors.New("client not found"))
+	}
+
+	db, err := utils.GetDb()
+	if err != nil {
+		return errorComponent(ctx, client, errors.New("unexpected error occured"))
+	}
+
+	userIds := getLocalUserIDsFromCookie(ctx)
+	var users []models.User
+	err = db.Where("id in ?", userIds).Find(&users).Error
+	if err != nil {
+		return errorComponent(ctx, client, errors.New("unexpected error occured"))
+	}
+
+	return components.SelectUser(components.SelectUserProps{
+		Users:            users,
+		Client:           client,
+		LoginEndpoint:    setUrlWithFlowQueries("/login", flowQueries),
+		RegisterEndpoint: setUrlWithFlowQueries("/register", flowQueries),
+	}).Render(ctx.Context(), ctx.Response().BodyWriter())
 }
 
 func LoginWithPassword(ctx *fiber.Ctx) error {
