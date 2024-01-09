@@ -1,16 +1,18 @@
 package components
 
-templ Login () {
+templ Login (isRegister bool) {
 	@rootHTML() {
 		<div style="display:flex; align-items:center; justify-content:center; height:100vh">
-			<form id="concent-form">
+			<form id="consent-form">
 				<fluent-card style="width:320px; display:flex; flex-direction:column; gap:16px; padding: 64px 32px 64px 32px; height:min-content">
+				    if isRegister {
+				        <fluent-text-field appearance="outline" placeholder="User Name" name="name">Name</fluent-text-field>
+				    }
 					<fluent-text-field appearance="outline" placeholder="user@email.com" name="email">Email</fluent-text-field>
-					<fluent-text-field type="password" appearance="outline" placeholder="shhh ...)" name="password">Password</fluent-text-field>
+					<fluent-text-field type="password" appearance="outline" placeholder="shh ...)" name="password">Password</fluent-text-field>
 					<fluent-button appearance="accent" type="submit">Login</fluent-button>
 				</fluent-card>
 			</form>
 		</div>
-		<script src="/public/javascript/login.js"></script>
 	}
 }

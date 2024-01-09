@@ -11,7 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/joho/godotenv"
-	"github.com/m3rashid/central/auth/controllers"
+	"github.com/m3rashid/central/auth/handlers"
 )
 
 func main() {
@@ -65,11 +65,13 @@ func main() {
 		}))
 	}
 
-	app.Get("/login", controllers.RenderLoginScreen)
-	app.Post("/login", controllers.LoginWithPassword)
-	app.Post("/register", controllers.Register)
-	app.Get("/discover", controllers.DiscoverResourceServers)
-	app.Get("/consent", controllers.RenderConsentScreen)
+	app.Get("/login", handlers.RenderLoginScreen)
+	app.Post("/login", handlers.LoginWithPassword)
+
+	app.Get("/register", handlers.RenderRegisterScreen)
+	app.Post("/register", handlers.Register)
+	app.Get("/discover", handlers.DiscoverResourceServers)
+	app.Get("/consent", handlers.RenderConsentScreen)
 
 	// TODO auto-migrate database
 	// db, err := utils.GetDb()
@@ -77,7 +79,7 @@ func main() {
 	// 	log.Fatal(err)
 	// }
 	// db.AutoMigrate(models.Models...)
-	go controllers.PingResourceServers()
+	go handlers.PingResourceServers()
 
 	log.Println("Server is running")
 	app.Listen(":" + os.Getenv("AUTH_SERVER_PORT"))

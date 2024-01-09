@@ -1,8 +1,6 @@
-package controllers
+package handlers
 
 import (
-	"time"
-
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/m3rashid/central/auth/components"
@@ -11,8 +9,16 @@ import (
 )
 
 func RenderLoginScreen(ctx *fiber.Ctx) error {
+	// TODO: handle additional request queries to revert back and state to preserve
 	ctx.Set("Content-Type", "text/html")
-	component := components.Login()
+	component := components.Login(false)
+	return component.Render(ctx.Context(), ctx.Response().BodyWriter())
+}
+
+func RenderRegisterScreen(ctx *fiber.Ctx) error {
+	// TODO: handle additional request queries to revert back and state to preserve
+	ctx.Set("Content-Type", "text/html")
+	component := components.Login(true)
 	return component.Render(ctx.Context(), ctx.Response().BodyWriter())
 }
 
@@ -41,19 +47,16 @@ func LoginWithPassword(ctx *fiber.Ctx) error {
 	if err := db.Where("email = ?", login.Email).First(&user).Error; err != nil {
 		return err
 	}
+	if user.ID == 0 {
+		return ctx.Redirect("/register") // TODO: handle flow queries
+	}
 
 	if err := utils.ComparePassword(user.Password, login.Password); err != nil {
 		return err
 	}
 
-	ctx.Cookie(&fiber.Cookie{
-		Name:    "token",
-		Value:   "", // TODO
-		Domain:  "localhost",
-		Expires: time.Now().Add(5 * time.Hour),
-	})
-
-	return nil
+	addUserIDToCookie(ctx, user.ID)
+	return ctx.Status(fiber.StatusOK).JSON(user)
 }
 
 func Register(ctx *fiber.Ctx) error {
