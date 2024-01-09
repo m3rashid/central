@@ -7,6 +7,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/favicon"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/joho/godotenv"
@@ -39,6 +40,17 @@ func main() {
 
 	app.Use(cors.New())
 
+	app.Static("/public", "./public", fiber.Static{
+		Compress:  true,
+		ByteRange: true,
+		Browse:    true,
+	})
+
+	app.Use(favicon.New(favicon.Config{
+		File: "./public/icons/favicon.ico",
+		URL:  "/favicon.ico",
+	}))
+
 	if os.Getenv("SERVER_MODE") == "production" {
 		app.Use(limiter.New(limiter.Config{
 			Max:               100,
@@ -52,6 +64,11 @@ func main() {
 			Format: "${time} ${status} ${latency} ${method} ${path} ${body} ${query}\n",
 		}))
 	}
+
+	app.Post("/login", controllers.LoginWithPassword)
+	app.Post("/register", controllers.Register)
+	app.Get("/discover", controllers.DiscoverResourceServers)
+	app.Get("/concent", controllers.RenderConsentScreen)
 
 	// TODO auto-migrate database
 	// db, err := utils.GetDb()

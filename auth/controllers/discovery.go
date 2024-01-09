@@ -1,60 +1,74 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/m3rashid/central/internal/discovery"
 )
 
-type Endpoints map[string]struct {
-	Method      string `json:"method"`
-	Description string `json:"description"`
-}
-
-type ResourceServer struct {
-	Name        string    `json:"name"`
-	BaseUrl     string    `json:"url"`
-	Endpoints   Endpoints `json:"endpoints"`
-	LastUpdated time.Time `json:"last_updated"`
-}
-
-var ResourceDiscoveryUrls = map[string]string{
+var resourceDiscoveryUrls = map[string]string{
 	"contacts": "http://localhost:5001/discovery",
 	// ...
 }
 
-var resourceServers = []ResourceServer{}
+var resourceServerDetailsMap = discovery.ResourceServersMap{}
+
+func DiscoverResourceServers(ctx *fiber.Ctx) error {
+	scope := ctx.Query("scope", "all")
+	if scope == "all" {
+		return ctx.Status(fiber.StatusOK).JSON(resourceServerDetailsMap)
+	}
+
+	details, resourceServerExists := resourceServerDetailsMap[scope]
+	if !resourceServerExists {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "No such resource server exists",
+		})
+	}
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
+		scope: details,
+	})
+}
 
 /**
- * the idea is to pign the resource servers in the background
- * in a specified time interval and cache the results
+ * ping the resource servers in the background
+ * in specified time intervals and cache the results
  */
 func PingResourceServers() {
-	for tick := range time.Tick(3 * time.Second) {
+	timeTick := time.NewTicker(time.Second * 5)
+
+	for tick := range timeTick.C {
 		fmt.Println(tick)
 
-		for name, url := range ResourceDiscoveryUrls {
+		for name, url := range resourceDiscoveryUrls {
 			response, err := http.Get(url)
 			if err != nil {
 				return
 			}
 
-			fmt.Println(name, response)
+			byteArr, err := io.ReadAll(response.Body)
+			if err != nil {
+				return
+			}
+
+			var resourceServerDetails discovery.ResourceServerDetails
+			if err := json.Unmarshal(byteArr, &resourceServerDetails); err != nil {
+				return
+			}
+
+			currentResourceServerDetails, resourceServerExists := resourceServerDetailsMap[name]
+			if resourceServerExists {
+				currentResourceServerDetails = resourceServerDetails
+			} else {
+				resourceServerDetailsMap[name] = resourceServerDetails
+			}
+			currentResourceServerDetails.LastUpdated = time.Now()
+			resourceDiscoveryUrls[name] = resourceServerDetails.BaseUrl + "/discovery"
 		}
 	}
-}
-
-func GetResourceUrls(ctx *fiber.Ctx) error {
-	type ResourceDiscoveryInput struct {
-		ResourceServerName string `json:"app_name" validate:"required"`
-	}
-	var resourceDiscoveryInput ResourceDiscoveryInput
-
-	if err := ctx.BodyParser(&resourceDiscoveryInput); err != nil {
-		return err
-	}
-
-	return nil
 }

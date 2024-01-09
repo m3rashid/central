@@ -1,0 +1,31 @@
+package components
+
+templ Index() {
+	<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+    <script src="https://unpkg.com/htmx.org@1.9.9"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script type="module" src="https://unpkg.com/@fluentui/web-components"></script>
+    <style>
+		html, body {
+  		margin: 0;
+  		padding: 0;
+  		box-sizing: border-box;
+		}
+		</style>
+  </head>
+  <body>
+    // {{template "globals/header" .}}
+    <fluent-button appearance="accent" hx-post="/clicked" hx-trigger="click" hx-target="#parent-div" hx-swap="outerHTML">Click Me</fluent-button>
+
+    <br />
+
+    <div id="parent-div">Hello world</div>
+
+    // {{template "globals/footer" .}}
+  </body>
+</html>
+}
