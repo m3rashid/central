@@ -1,0 +1,24 @@
+package components
+
+templ rootHTML() {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<title>Document</title>
+			<script src="https://unpkg.com/htmx.org@1.9.9"></script>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<script type="module" src="https://unpkg.com/@fluentui/web-components"></script>
+			<style>
+		html, body {
+  		margin: 0;
+  		padding: 0;
+  		box-sizing: border-box;
+		}
+		</style>
+		</head>
+		<body>
+			{ children... }
+		</body>
+	</html>
+}

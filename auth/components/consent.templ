@@ -1,0 +1,27 @@
+package components
+
+templ Consent () {
+	<script>
+		window.addEventListener("load", () => {
+			const form = document.getElementById("concent-form")
+			form.addEventListener("submit", (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+				const formData = new FormData(form);
+				const data = Object.fromEntries(formData.entries());
+				console.log(data)
+			})
+		})
+	</script>
+	@rootHTML() {
+		<div style="display:flex; align-items:center; justify-content:center; height:100vh">
+			<form id="concent-form">
+				<fluent-card style="width:320px; display:flex; flex-direction:column; gap:16px; padding: 64px 32px 64px 32px; height:min-content">
+					<fluent-text-field appearance="outline" placeholder="user@email.com" name="email">Email</fluent-text-field>
+					<fluent-text-field type="password" appearance="outline" placeholder="shhh ...)" name="password">Password</fluent-text-field>
+					<fluent-button appearance="accent" type="submit">Login</fluent-button>
+				</fluent-card>
+			</form>
+		</div>
+	}
+}

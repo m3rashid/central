@@ -7,6 +7,6 @@ import (
 
 func RenderConsentScreen(ctx *fiber.Ctx) error {
 	ctx.Set("Content-Type", "text/html")
-	component := components.Index()
+	component := components.Consent()
 	return component.Render(ctx.Context(), ctx.Response().BodyWriter())
 }
