@@ -12,7 +12,7 @@ import (
 
 func RenderLoginScreen(ctx *fiber.Ctx) error {
 	ctx.Set("Content-Type", "text/html")
-	component := components.Consent()
+	component := components.Login()
 	return component.Render(ctx.Context(), ctx.Response().BodyWriter())
 }
 

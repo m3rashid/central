@@ -1,18 +1,6 @@
 package components
 
-templ Consent () {
-	<script>
-		window.addEventListener("load", () => {
-			const form = document.getElementById("concent-form")
-			form.addEventListener("submit", (e) => {
-				e.preventDefault();
-				e.stopPropagation();
-				const formData = new FormData(form);
-				const data = Object.fromEntries(formData.entries());
-				console.log(data)
-			})
-		})
-	</script>
+templ Login () {
 	@rootHTML() {
 		<div style="display:flex; align-items:center; justify-content:center; height:100vh">
 			<form id="concent-form">
@@ -23,5 +11,6 @@ templ Consent () {
 				</fluent-card>
 			</form>
 		</div>
+		<script src="/public/javascript/login.js"></script>
 	}
 }

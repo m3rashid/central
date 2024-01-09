@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"internal/discovery"
 	"io"
 	"net/http"
@@ -42,9 +41,7 @@ func DiscoverResourceServers(ctx *fiber.Ctx) error {
 func PingResourceServers() {
 	timeTick := time.NewTicker(time.Second * 5)
 
-	for tick := range timeTick.C {
-		fmt.Println(tick)
-
+	for range timeTick.C {
 		for name, url := range resourceDiscoveryUrls {
 			response, err := http.Get(url)
 			if err != nil {

@@ -65,6 +65,7 @@ func main() {
 		}))
 	}
 
+	app.Get("/login", controllers.RenderLoginScreen)
 	app.Post("/login", controllers.LoginWithPassword)
 	app.Post("/register", controllers.Register)
 	app.Get("/discover", controllers.DiscoverResourceServers)
