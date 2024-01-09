@@ -1,11 +1,11 @@
 package main
 
 import (
+	"github.com/gofiber/fiber/v2"
 	"log"
 	"os"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
@@ -69,7 +69,7 @@ func main() {
 	app.Post("/login", controllers.LoginWithPassword)
 	app.Post("/register", controllers.Register)
 	app.Get("/discover", controllers.DiscoverResourceServers)
-	app.Get("/concent", controllers.RenderConsentScreen)
+	app.Get("/consent", controllers.RenderConsentScreen)
 
 	// TODO auto-migrate database
 	// db, err := utils.GetDb()
