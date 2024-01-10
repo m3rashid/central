@@ -17,33 +17,12 @@ func initialSeedDatabase() error {
 	}
 
 	// create default user
-	adminUser := models.User{
+	defaultUser := models.User{
 		Name:         "MD Rashid Hussain",
 		Email:        "m3rashid.hussain@gmail.com",
 		Password:     hashedPassword,
 		OTP:          helpers.GenerateOTP(),
 		UserVerified: true,
-	}
-
-	// create default permissions
-	permissions := []*models.Permission{
-		{Name: "read"}, {Name: "create"}, {Name: "update"}, {Name: "create"},
-	}
-
-	// create default scope
-	scopes := []*models.Scope{
-		{Name: "openid", Description: "", Permissions: permissions},
-		{Name: "contacts", Description: "", Permissions: permissions},
-	}
-
-	client := models.Client{
-		ClientID:           "client-id",
-		ClientSecret:       "sample-client-secret",
-		Scopes:             scopes,
-		SuccessRedirectUri: "http://localhost:5001/success",
-		FailureRedirectUri: "http://localhost:5001/failure",
-		AppName:            "Contacts",
-		AppLogoUrl:         "http://localhost:5000/public/icons/favicon.ico",
 	}
 
 	db, err := utils.GetDb()
@@ -53,19 +32,20 @@ func initialSeedDatabase() error {
 	}
 
 	return db.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Create(&adminUser).Error; err != nil {
+		if err := tx.Create(&defaultUser).Error; err != nil {
 			log.Println("Could not create user")
 			return err
 		}
 
-		if err := tx.Create(permissions).Error; err != nil {
-			log.Println("Could not create permissions")
-			return err
-		}
-
-		if err := tx.Create(scopes).Error; err != nil {
-			log.Println("Could not create scopes")
-			return err
+		client := models.Client{
+			ClientID:           "client-id",
+			ClientSecret:       "sample-client-secret",
+			Scopes:             "", // TODO
+			SuccessRedirectUri: "http://localhost:5001/success",
+			FailureRedirectUri: "http://localhost:5001/failure",
+			AppName:            "Campaigns",
+			AppLogoUrl:         "http://localhost:5000/public/icons/favicon.ico",
+			CreatedByUserID:    defaultUser.ID,
 		}
 
 		if err := tx.Create(&client).Error; err != nil {

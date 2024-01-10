@@ -19,6 +19,7 @@ func RenderConsentScreen(ctx *fiber.Ctx) error {
 	consentScreenScopes := []components.ConsentScreenScope{}
 	for _, scope := range client.Scopes {
 		newScope := components.ConsentScreenScope{Name: scope.Name, Permissions: []string{}}
+		// TODO: get scopes and permissions from discovery
 		for _, permission := range scope.Permissions {
 			newScope.Permissions = append(newScope.Permissions, permission.Name)
 		}

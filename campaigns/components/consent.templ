@@ -1,0 +1,19 @@
+package components
+
+script handleLoginButtonClicked() {
+	window.open("http://localhost:5000/init?client_id=client-id&response_type=code", "Central Auth", "height=600,width=400,location=0,titlebar=0")
+}
+
+templ LoginScreen() {
+	<style>
+		.login-button {
+			padding: 8px 16px;
+			border-radius: 6px;
+			border: 0;
+			outline: 0;
+			background-color: #1c1c1c;
+			color: #fff;
+		}
+	</style>
+	<button class="login-button" onClick={ handleLoginButtonClicked() }>Login with Central</button>
+}

@@ -10,7 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/joho/godotenv"
-	"github.com/m3rashid/central/contacts/handlers"
+	"github.com/m3rashid/central/campaigns/handlers"
 )
 
 func main() {
@@ -56,7 +56,8 @@ func main() {
 	app.Get("/discovery", handlers.Discovery)
 	app.Get("/success", handlers.ConsentSuccessScreen)
 	app.Get("/failure", handlers.ConsentFailureScreen)
+	app.Get("/login", handlers.RenderLoginScreen)
 
 	log.Println("Server is running")
-	app.Listen(":" + os.Getenv("CONTACTS_SERVER_PORT"))
+	app.Listen(":" + os.Getenv("CAMPAIGNS_SERVER_PORT"))
 }

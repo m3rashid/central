@@ -1,0 +1,57 @@
+package components
+
+import "internal/helpers"
+
+type InputProps struct {
+	Label            string
+	TopRightText     string
+	InputType        string
+	InputID          string
+	InputName        string
+	InputPlaceholder string
+	InputAria        string
+}
+
+templ input(props InputProps) {
+	<div>
+		<div className="flex justify-between">
+			if props.Label != "" {
+				<label htmlFor={ props.InputName } className="block text-sm font-medium leading-6 text-gray-900">
+					{ props.Label }
+				</label>
+			}
+			if props.TopRightText != "" {
+				<span className="text-sm leading-6 text-gray-500">
+					{ props.TopRightText }
+				</span>
+			}
+		</div>
+		<div className="mt-2">
+			<input
+				type={ helpers.Ternary[string](props.InputType != "", props.InputType, "text") }
+				name={ props.InputName }
+				id={ helpers.Ternary[string](props.InputID != "", props.InputID, props.InputName) }
+				className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+				placeholder={ props.InputPlaceholder }
+				aria-describedby={ helpers.Ternary[string](props.InputAria != "", props.InputAria, props.InputName+"-"+props.InputType) }
+			/>
+		</div>
+	</div>
+}
+
+type ButtonProps struct {
+	ButtonText  string
+	OtherStyles string
+	onClick     templ.ComponentScript
+	ButtonType  string
+}
+
+templ button(props ButtonProps) {
+	<button
+		type={ props.ButtonType }
+		onclick={ props.onClick }
+		className={ "rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 " + props.OtherStyles }
+	>
+		{ props.ButtonText }
+	</button>
+}

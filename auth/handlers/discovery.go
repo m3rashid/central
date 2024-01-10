@@ -13,7 +13,7 @@ import (
 )
 
 var resourceDiscoveryUrls = map[string]string{
-	"contacts": "http://contacts-webserver:5001/discovery",
+	"campaigns": "http://campaigns-webserver:5001/discovery",
 	// ...
 }
 

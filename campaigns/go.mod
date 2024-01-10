@@ -1,4 +1,4 @@
-module github.com/m3rashid/central/contacts
+module github.com/m3rashid/central/campaigns
 
 go 1.21.5
 

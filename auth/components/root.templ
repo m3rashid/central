@@ -6,18 +6,30 @@ templ rootHTML() {
 		<head>
 			<meta charset="UTF-8"/>
 			<title>Document</title>
-			<script src="https://unpkg.com/htmx.org@1.9.9"></script>
+			<script src="https://cdn.tailwindcss.com"></script>
+			<script>
+				tailwind.config = {
+					darkMode: "class",
+					theme: {
+						extend: {}
+					},
+					plugins: [
+						 require("@tailwindcss/forms"),
+					],
+				}
+  		</script>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			<script type="module" src="https://unpkg.com/@fluentui/web-components"></script>
+			// <script src="https://unpkg.com/htmx.org@1.9.9"></script>
+			// <script type="module" src="https://unpkg.com/@fluentui/web-components"></script>
 			<link rel="preconnect" href="https://fonts.googleapis.com"/>
 			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 			<link
-				href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
 				rel="stylesheet"
+				href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
 			/>
 			<style>
-				html, body { margin: 0; padding: 0; box-sizing: border-box; }
-				* { font-family: "Inter", sans-serif; }
+				html, body { margin: 0; padding: 0;  }
+				* { font-family: "Inter", sans-serif; box-sizing: border-box; border:0; outline:none; }
 				.all-center { display: flex; align-items:center; justify-content:center; }
 		</style>
 		</head>

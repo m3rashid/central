@@ -18,6 +18,9 @@ var endpoints = discovery.ResourceServerDetails{
 			Description: "Get contact by ID",
 		},
 	},
+	Scopes: discovery.Scopes{
+		"contacts": {"read", "create", "update", "delete"},
+	},
 }
 
 func Discovery(ctx *fiber.Ctx) error {

@@ -1,6 +1,6 @@
 go 1.21.5
 
-use ./contacts
+use ./campaigns
 use ./auth
 use ./internal
 use ./apps/connects

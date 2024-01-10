@@ -5,7 +5,7 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/auth/tmp" />
-      <excludeFolder url="file://$MODULE_DIR$/contacts/tmp" />
+      <excludeFolder url="file://$MODULE_DIR$/campaigns/tmp" />
       <excludeFolder url="file://$MODULE_DIR$/.idea/dataSources" />
     </content>
     <orderEntry type="inheritedJdk" />

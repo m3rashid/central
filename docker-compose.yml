@@ -21,15 +21,15 @@ services:
     depends_on:
       - database
 
-  contacts-webserver:
+  campaigns-webserver:
     build:
       context: .
-      dockerfile: contacts.Dockerfile
+      dockerfile: campaigns.Dockerfile
     restart: always
     env_file:
-      - ./contacts/.env
+      - ./campaigns/.env
     volumes:
-      - ./contacts:/app/contacts
+      - ./campaigns:/app/campaigns
       - ./internal:/app/internal
     ports:
       - 5001:5001
@@ -43,7 +43,7 @@ services:
     environment:
       POSTGRES_USER: genos
       POSTGRES_PASSWORD: genos
-      POSTGRES_MULTIPLE_DATABASES: auth,contacts
+      POSTGRES_MULTIPLE_DATABASES: auth,campaigns
     ports:
       - 5432:5432
     volumes:

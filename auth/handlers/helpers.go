@@ -130,6 +130,7 @@ func getClient(ctx *fiber.Ctx) (models.Client, FlowQueries, error) {
 	}
 
 	// check if the scopes asked for, is included in the registered scopes of the client
+	// get scopes from discovery
 	for _, registeredScope := range client.Scopes {
 		var scopeMatched = false
 		// TODO: make it granular -- also check the permission levels

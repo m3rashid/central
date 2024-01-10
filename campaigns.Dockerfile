@@ -8,6 +8,6 @@ WORKDIR /app
 COPY . .
 
 RUN cd internal && go mod download && cd ..
-RUN cd contacts && go mod download && cd ..
+RUN cd campaigns && go mod download && cd ..
 
-WORKDIR /app/contacts
+WORKDIR /app/campaigns
