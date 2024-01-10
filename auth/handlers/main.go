@@ -4,18 +4,10 @@ import (
 	"errors"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/m3rashid/central/auth/components"
-	"github.com/m3rashid/central/auth/models"
 )
-
-func errorComponent(ctx *fiber.Ctx, client models.Client, err error) error {
-	component := components.FlowError([]string{err.Error()}, client)
-	return component.Render(ctx.Context(), ctx.Response().BodyWriter())
-}
 
 func InitFlow(ctx *fiber.Ctx) error {
 	ctx.Set("Content-Type", "text/html")
-
 	client, flowQueries, err := getClient(ctx)
 	if err != nil {
 		return errorComponent(ctx, client, errors.New("unexpected error occured"))

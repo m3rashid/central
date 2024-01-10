@@ -7,16 +7,23 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/m3rashid/central/auth/components"
 	"github.com/m3rashid/central/auth/models"
 	"github.com/m3rashid/central/auth/utils"
 )
 
-const StateKey = "state"
-const ClientIDKey = "client_id"
-const ResponseTypeKey = "response_type"
-const ScopesKey = "scopes"
+const stateQueryKey = "state"
+const clientIDQueryKey = "client_id"
+const responseTypeQueryKey = "response_type"
+const scopesQueryKey = "scopes"
 
-const LocalUsersCookieName = "local_users"
+const localUsersCookieName = "local_users"
+const selectedUserIDKey = "selected_user"
+
+func errorComponent(ctx *fiber.Ctx, client models.Client, err error) error {
+	component := components.FlowError([]string{err.Error()}, client)
+	return component.Render(ctx.Context(), ctx.Response().BodyWriter())
+}
 
 type FlowQueries struct {
 	ClientID     string
@@ -27,18 +34,15 @@ type FlowQueries struct {
 
 func getFlowQueries(ctx *fiber.Ctx) (FlowQueries, error) {
 	var flowQueries FlowQueries
-	scopes := ctx.Query(ScopesKey, "")
-	flowQueries.ClientID = ctx.Query(ClientIDKey, "")
-	flowQueries.ResponseType = ctx.Query(ResponseTypeKey, "")
+	scopes := ctx.Query(scopesQueryKey, "")
+	flowQueries.ClientID = ctx.Query(clientIDQueryKey, "")
+	flowQueries.ResponseType = ctx.Query(responseTypeQueryKey, "")
 
 	if flowQueries.ClientID == "" || flowQueries.ResponseType == "" {
 		return flowQueries, errors.New("client_id and/or response_type missing")
 	}
 
-	for _, scope := range strings.Split(scopes, ",") {
-		flowQueries.Scopes = append(flowQueries.Scopes, scope)
-	}
-
+	flowQueries.Scopes = append(flowQueries.Scopes, strings.Split(scopes, ",")...)
 	return flowQueries, nil
 }
 
@@ -48,9 +52,9 @@ func setUrlWithFlowQueries(baseUrl string, flowQueries FlowQueries) string {
 	}
 
 	return baseUrl + "?" +
-		ClientIDKey + "=" + flowQueries.ClientID + "&" +
-		ResponseTypeKey + "=" + flowQueries.ResponseType +
-		helpers.Ternary[string](flowQueries.State != "", "&"+StateKey+"="+flowQueries.State, "")
+		clientIDQueryKey + "=" + flowQueries.ClientID + "&" +
+		responseTypeQueryKey + "=" + flowQueries.ResponseType +
+		helpers.Ternary[string](flowQueries.State != "", "&"+stateQueryKey+"="+flowQueries.State, "")
 }
 
 func setLocalUsersCookie(ctx *fiber.Ctx, userIDs []uint) {
@@ -64,7 +68,7 @@ func setLocalUsersCookie(ctx *fiber.Ctx, userIDs []uint) {
 
 	ctx.Cookie(&fiber.Cookie{
 		HTTPOnly: true,
-		Name:     LocalUsersCookieName,
+		Name:     localUsersCookieName,
 		Value:    userIDsString,
 		Domain:   "localhost", // TODO: handle this for deployments
 	})
@@ -72,7 +76,7 @@ func setLocalUsersCookie(ctx *fiber.Ctx, userIDs []uint) {
 
 func getLocalUserIDsFromCookie(ctx *fiber.Ctx) []uint {
 	var users []uint
-	userIDsString := ctx.Cookies(LocalUsersCookieName, "")
+	userIDsString := ctx.Cookies(localUsersCookieName, "")
 	userIDsStringArray := strings.Split(userIDsString, ",")
 	for _, userIDString := range userIDsStringArray {
 		u64, err := strconv.ParseUint(userIDString, 10, 32)

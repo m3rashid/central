@@ -1,6 +1,7 @@
 package components
 
 import "github.com/m3rashid/central/auth/models"
+import "fmt"
 
 templ cardContainer (client models.Client) {
 	@rootHTML() {
@@ -42,17 +43,22 @@ templ LoginOrRegister (props LoginProps, client models.Client) {
 }
 
 type SelectUserProps struct {
-	Users            []models.User
-	Client           models.Client
-	LoginEndpoint    string
-	RegisterEndpoint string
+	Users             []models.User
+	Client            models.Client
+	LoginEndpoint     string
+	RegisterEndpoint  string
+	UserIDSelectedURL string
+}
+
+script onUserIDSelect(url string) {
+	return fetch(url, { method: "POST" })
 }
 
 templ SelectUser (props SelectUserProps) {
 	@cardContainer(props.Client) {
 		<div style="display:flex; align-items:center; flex-firection:column; gap:16px">
 			for _, user := range props.Users {
-				<div style="display:flex;flex-direction:column;gap:2px">
+				<div style="display:flex;flex-direction:column;gap:2px" onClick={ onUserIDSelect(props.UserIDSelectedURL + fmt.Sprint(user.ID)) }>
 					<p>{ user.Name }</p>
 					<p>{ user.Email }</p>
 				</div>
@@ -69,5 +75,40 @@ templ FlowError (errors []string, client models.Client) {
 		for _, err := range errors {
 			<div>{ err }</div>
 		}
+	}
+}
+
+type ConsentScreenScope struct {
+	Name        string
+	Permissions []string
+}
+
+type ConsentScreenProps struct {
+	Client models.Client
+	Scopes []ConsentScreenScope
+}
+
+templ ConsentScreen(props ConsentScreenProps) {
+	@cardContainer(props.Client) {
+		<h3 style="text-align:center">{ props.Client.AppName } would like to access the following from your account</h3>
+		for _, scope := range props.Scopes {
+			<div style="display:flex; align-items:center; flex-direction:column; gap:5px; margin-bottom: 16px">
+				<p>{ scope.Name }</p>
+				for _, perm := range scope.Permissions {
+					<p>{ perm }</p>
+				}
+			</div>
+		}
+		<h3 style="text-align:center">Do you allow ?</h3>
+	}
+}
+
+templ LogoutScreen(client models.Client) {
+	@cardContainer(client) {
+		<h3>Are you sure you want to logout?</h3>
+		<div>
+			<fluent-button>Logout</fluent-button>
+			<fluent-button>Cancel</fluent-button>
+		</div>
 	}
 }

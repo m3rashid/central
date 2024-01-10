@@ -1,9 +1,13 @@
 package models
 
+import (
+	internal "internal/models"
+)
+
 const SCOPE_TABLE_NAME = "scopes"
 
 type Scope struct {
-	BaseModel
+	internal.BaseModel
 	Name        string        `json:"name" gorm:"column:name" validate:"required"`
 	Description string        `json:"description" gorm:"column:description" validate:""`
 	Permissions []*Permission `json:"permissions" gorm:"many2many:permissions_scope_relation" validate:""`
@@ -16,7 +20,7 @@ func (*Scope) TableName() string {
 const PERMISSION_TABLE_NAME = "permissions"
 
 type Permission struct {
-	BaseModel
+	internal.BaseModel
 	Name string `json:"name" gorm:"column:name" validate:"required"`
 }
 

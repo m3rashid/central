@@ -1,9 +1,13 @@
 package models
 
+import (
+	internal "internal/models"
+)
+
 const CLIENT_TABLE_NAME = "clients"
 
 type Client struct {
-	BaseModel
+	internal.BaseModel
 	ClientID           string   `json:"client_id" gorm:"column:client_id" validate:"required"`
 	ClientSecret       string   `json:"client_secret" gorm:"column:client_secret" validate:"required"`
 	Scopes             []*Scope `json:"scopes" gorm:"many2many:scopes_client_relation" validate:""`
