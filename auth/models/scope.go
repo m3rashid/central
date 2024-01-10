@@ -8,7 +8,7 @@ const SCOPE_TABLE_NAME = "scopes"
 
 type Scope struct {
 	internal.BaseModel
-	Name        string        `json:"name" gorm:"column:name" validate:"required"`
+	Name        string        `json:"name" gorm:"column:name;not null" validate:"required"`
 	Description string        `json:"description" gorm:"column:description" validate:""`
 	Permissions []*Permission `json:"permissions" gorm:"many2many:permissions_scope_relation" validate:""`
 }

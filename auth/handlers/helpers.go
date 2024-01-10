@@ -119,7 +119,9 @@ func getClient(ctx *fiber.Ctx) (models.Client, FlowQueries, error) {
 		return client, flowQueries, err
 	}
 
-	err = db.Preload("Scopes").Preload("Scopes.Permission").Where("client_id = ?", flowQueries.ClientID).First(&client).Error
+	err = db.Table(models.CLIENT_TABLE_NAME).
+		Where("client_id = ?", flowQueries.ClientID).First(&client).
+		Preload("Scopes").Preload("Scopes.Permission").Error
 	if err != nil || client.ID == 0 {
 		return client, flowQueries, err
 	}

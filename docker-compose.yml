@@ -17,7 +17,7 @@ services:
       - ./internal:/app/internal
     ports:
       - 5000:5000
-    command: go run main.go
+    command: air
     depends_on:
       - database
 
@@ -33,7 +33,7 @@ services:
       - ./internal:/app/internal
     ports:
       - 5001:5001
-    command: go run main.go
+    command: air
     depends_on:
       - database
 

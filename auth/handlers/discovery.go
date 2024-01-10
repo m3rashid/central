@@ -4,22 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"internal/discovery"
-	"internal/helpers"
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-var localResourceDiscoveryUrls = map[string]string{
-	"contacts": "http://localhost:5001/discovery",
-	// ...
-}
-
-var dockerResourceDiscoveryUrls = map[string]string{
+var resourceDiscoveryUrls = map[string]string{
 	"contacts": "http://contacts-webserver:5001/discovery",
 	// ...
 }
@@ -48,13 +41,7 @@ func DiscoverResourceServers(ctx *fiber.Ctx) error {
  * in specified time intervals and cache the results
  */
 func PingResourceServers() {
-	timeTick := time.NewTicker(time.Second * 5)
-	serverEnvironment := os.Getenv("ENVIRONMENT")
-	resourceDiscoveryUrls := helpers.Ternary[map[string]string](
-		serverEnvironment == "docker",
-		dockerResourceDiscoveryUrls,
-		localResourceDiscoveryUrls,
-	)
+	timeTick := time.NewTicker(time.Minute * 5)
 
 	for range timeTick.C {
 		for name, url := range resourceDiscoveryUrls {

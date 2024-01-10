@@ -86,6 +86,11 @@ func main() {
 	}
 	db.AutoMigrate(models.Models...)
 
+	// err = initialSeedDatabase()
+	// if err != nil {
+	// 	log.Fatal("database seeding failed")
+	// }
+
 	go handlers.PingResourceServers()
 
 	log.Println("Server is running")
