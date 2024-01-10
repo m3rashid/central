@@ -9,3 +9,5 @@ build
 *.env.*
 !sample.env
 *_templ.go
+data/*
+!data/.gitkeep

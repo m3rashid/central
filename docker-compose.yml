@@ -1,0 +1,60 @@
+name: central
+
+networks:
+  default:
+    name: central
+
+services:
+  auth-webserver:
+    build:
+      context: .
+      dockerfile: auth.Dockerfile
+    restart: always
+    env_file:
+      - ./auth/.env
+    volumes:
+      - ./auth:/app/auth
+      - ./internal:/app/internal
+    ports:
+      - 5000:5000
+    command: air
+    depends_on:
+      - database
+
+  # contacts-webserver:
+  #   build:
+  #     context: .
+  #     dockerfile: contacts.Dockerfile
+  #   restart: always
+  #   env_file:
+  #     - ./contacts/.env
+  #   volumes:
+  #     - ./contacts:/app/contacts
+  #     - ./internal:/app/internal
+  #   ports:
+  #     - 5001:5001
+  #   command: cd contacts && air
+  #   depends_on:
+  #     - database
+
+  database:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: genos
+      POSTGRES_PASSWORD: genos
+      POSTGRES_MULTIPLE_DATABASES: auth,contacts
+    ports:
+      - 5432:5432
+    volumes:
+      - ./data/postgresDb:/var/lib/postgresql/data
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:latest
+    restart: always
+    volumes:
+      - ./data:/data
+    ports:
+      - 6379:6379
