@@ -16,6 +16,7 @@ const stateQueryKey = "state"
 const clientIDQueryKey = "client_id"
 const responseTypeQueryKey = "response_type"
 const scopesQueryKey = "scopes"
+const consentQueryKey = "consent"
 
 const localUsersCookieName = "local_users"
 const selectedUserIDKey = "selected_user"
@@ -26,10 +27,11 @@ func errorComponent(ctx *fiber.Ctx, client models.Client, err error) error {
 }
 
 type FlowQueries struct {
-	ClientID     string
-	ResponseType string
-	State        string
-	Scopes       []string
+	ClientID       string
+	ResponseType   string
+	State          string
+	Scopes         []string
+	SelectedUserID string
 }
 
 func getFlowQueries(ctx *fiber.Ctx) (FlowQueries, error) {
@@ -37,6 +39,7 @@ func getFlowQueries(ctx *fiber.Ctx) (FlowQueries, error) {
 	scopes := ctx.Query(scopesQueryKey, "")
 	flowQueries.ClientID = ctx.Query(clientIDQueryKey, "")
 	flowQueries.ResponseType = ctx.Query(responseTypeQueryKey, "")
+	flowQueries.SelectedUserID = ctx.Query(selectedUserIDKey, "0")
 
 	if flowQueries.ClientID == "" || flowQueries.ResponseType == "" {
 		return flowQueries, errors.New("client_id and/or response_type missing")
@@ -54,7 +57,8 @@ func setUrlWithFlowQueries(baseUrl string, flowQueries FlowQueries) string {
 	return baseUrl + "?" +
 		clientIDQueryKey + "=" + flowQueries.ClientID + "&" +
 		responseTypeQueryKey + "=" + flowQueries.ResponseType +
-		helpers.Ternary[string](flowQueries.State != "", "&"+stateQueryKey+"="+flowQueries.State, "")
+		helpers.Ternary[string](flowQueries.State != "", "&"+stateQueryKey+"="+flowQueries.State, "") +
+		helpers.Ternary[string](flowQueries.SelectedUserID != "0", "&"+selectedUserIDKey+"="+flowQueries.SelectedUserID, "")
 }
 
 func setLocalUsersCookie(ctx *fiber.Ctx, userIDs []uint) {
@@ -63,9 +67,8 @@ func setLocalUsersCookie(ctx *fiber.Ctx, userIDs []uint) {
 		userIDStringArray = append(userIDStringArray, strconv.FormatUint(uint64(userId), 10))
 	}
 
-	userIDsString := strings.Join(userIDStringArray, ",")
 	// TODO: also hash this
-
+	userIDsString := strings.Join(helpers.RemoveDuplicates(userIDStringArray), ",")
 	ctx.Cookie(&fiber.Cookie{
 		HTTPOnly: true,
 		Name:     localUsersCookieName,

@@ -35,7 +35,7 @@ func RenderSelectUserScreen(ctx *fiber.Ctx) error {
 		Client:            client,
 		LoginEndpoint:     setUrlWithFlowQueries("/login", flowQueries),
 		RegisterEndpoint:  setUrlWithFlowQueries("/register", flowQueries),
-		UserIDSelectedURL: setUrlWithFlowQueries("/select-user", flowQueries) + "&" + selectedUserIDKey + "=",
+		UserIDSelectedURL: setUrlWithFlowQueries("/handle-select-user", flowQueries) + "&" + selectedUserIDKey + "=",
 	}).Render(ctx.Context(), ctx.Response().BodyWriter())
 }
 

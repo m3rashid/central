@@ -76,7 +76,10 @@ func main() {
 	app.Post("/register", handlers.HandleRegister)
 
 	app.Get("/select-user", handlers.RenderSelectUserScreen)
-	app.Post("/select-user", handlers.HandleSelectUser)
+	app.Get("/handle-select-user", handlers.HandleSelectUser)
+
+	app.Get("/consent", handlers.RenderConsentScreen)
+	app.Get("/handle-consent", handlers.HandleConsent)
 
 	app.Get("/discover", handlers.DiscoverResourceServers)
 

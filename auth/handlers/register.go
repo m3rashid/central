@@ -18,8 +18,9 @@ func RenderRegisterScreen(ctx *fiber.Ctx) error {
 		return errorComponent(ctx, models.Client{}, errors.New("client not found"))
 	}
 
-	return components.LoginOrRegister(components.LoginProps{
+	return components.LoginOrRegister(components.LoginOrRegisterProps{
 		IsRegister:         true,
+		FlowQueryString:    setUrlWithFlowQueries("", flowQueries),
 		LoginEndpoint:      setUrlWithFlowQueries("/login", flowQueries),
 		RegisterEndpoint:   setUrlWithFlowQueries("/register", flowQueries),
 		SelectUserEndpoint: setUrlWithFlowQueries("/select-user", flowQueries),

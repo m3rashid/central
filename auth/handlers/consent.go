@@ -11,7 +11,7 @@ import (
 
 func RenderConsentScreen(ctx *fiber.Ctx) error {
 	ctx.Set("Content-Type", "text/html")
-	client, _, err := getClient(ctx)
+	client, flowQueries, err := getClient(ctx)
 	if err != nil {
 		return errorComponent(ctx, models.Client{}, errors.New("client not found"))
 	}
@@ -26,8 +26,10 @@ func RenderConsentScreen(ctx *fiber.Ctx) error {
 	}
 
 	component := components.ConsentScreen(components.ConsentScreenProps{
-		Client: client,
-		Scopes: consentScreenScopes,
+		Client:          client,
+		Scopes:          consentScreenScopes,
+		AllowConsentUrl: setUrlWithFlowQueries("/handle-consent", flowQueries) + "&" + consentQueryKey + "=true",
+		DenyConsentUrl:  setUrlWithFlowQueries("/handle-consent", flowQueries) + "&" + consentQueryKey + "=false",
 	})
 	return component.Render(ctx.Context(), ctx.Response().BodyWriter())
 }
@@ -39,7 +41,7 @@ func HandleConsent(ctx *fiber.Ctx) error {
 		return errorComponent(ctx, models.Client{}, errors.New("client not found"))
 	}
 
-	consent := ctx.Query("consent", "false")
+	consent := ctx.Query(consentQueryKey, "false")
 	if consent == "true" {
 		// TODO: add app to connected apps
 		return ctx.Redirect(client.SuccessRedirectUri + helpers.Ternary[string](flowQueries.State != "", "?"+stateQueryKey+"="+flowQueries.State, ""))

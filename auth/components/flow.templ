@@ -2,43 +2,52 @@ package components
 
 import "github.com/m3rashid/central/auth/models"
 import "fmt"
+import "internal/helpers"
 
 templ cardContainer (client models.Client) {
 	@rootHTML() {
 		<div style="height:100vh" class="all-center">
-			<fluent-card style="width:320px; display:flex; flex-direction:column; gap:16px; padding: 64px 32px 64px 32px; height:min-content">
+			<fluent-card style="width:320px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 64px 32px 64px 32px; height:min-content">
 				if client.AppLogoUrl != "" {
-					<img src={ client.AppLogoUrl } alt="app_logo"/>
+					<img height="50px" width="50px" style="text-align:center" src={ client.AppLogoUrl } alt="app_logo"/>
 				}
 				if client.AppName != "" {
-					<h3>{ client.AppName }</h3>
+					<h3 style="text-align:center">{ client.AppName }</h3>
 				}
+				{ children... }
 			</fluent-card>
 		</div>
 	}
 }
 
-type LoginProps struct {
+type LoginOrRegisterProps struct {
 	IsRegister         bool
+	FlowQueryString    string
 	LoginEndpoint      string
 	RegisterEndpoint   string
 	SelectUserEndpoint string
 }
 
-templ LoginOrRegister (props LoginProps, client models.Client) {
+templ LoginOrRegister (props LoginOrRegisterProps, client models.Client) {
 	@cardContainer(client) {
+		<form
+			method="POST"
+			style="display:flex; flex-direction:column; align-items:center; gap:16px; margin-bottom:20px"
+			action={ templ.SafeURL(helpers.Ternary[string](props.IsRegister, "/register"+props.FlowQueryString, "/login"+props.FlowQueryString)) }
+		>
+			if props.IsRegister {
+				<fluent-text-field appearance="outline" placeholder="User Name" name="name">Name</fluent-text-field>
+			}
+			<fluent-text-field appearance="outline" placeholder="user@email.com" name="email" id="email">Email</fluent-text-field>
+			<fluent-text-field type="password" appearance="outline" placeholder="shh ...)" name="password" id="password">Password</fluent-text-field>
+			<fluent-button appearance="accent" type="submit">Login</fluent-button>
+		</form>
 		if props.IsRegister {
-			<fluent-text-field appearance="outline" placeholder="User Name" name="name">Name</fluent-text-field>
-		}
-		<fluent-text-field appearance="outline" placeholder="user@email.com" name="email">Email</fluent-text-field>
-		<fluent-text-field type="password" appearance="outline" placeholder="shh ...)" name="password">Password</fluent-text-field>
-		<fluent-button appearance="accent" type="submit">Login</fluent-button>
-		if props.IsRegister {
-			<a href={ templ.SafeURL(props.LoginEndpoint) }>Account Not Listed here? Login</a>
+			<a style="text-align:center" href={ templ.SafeURL(props.LoginEndpoint) }>Account Not Listed here? Login</a>
 		} else {
-			<a href={ templ.SafeURL(props.RegisterEndpoint) }>Don't Have an account? Register</a>
+			<a style="text-align:center" href={ templ.SafeURL(props.RegisterEndpoint) }>Don't Have an account? Register</a>
 		}
-		<a href={ templ.SafeURL(props.SelectUserEndpoint) }>Already logged in? Select account</a>
+		<a style="text-align:center; margin-top:16px" href={ templ.SafeURL(props.SelectUserEndpoint) }>Already logged in? Select account</a>
 	}
 }
 
@@ -58,10 +67,13 @@ templ SelectUser (props SelectUserProps) {
 	@cardContainer(props.Client) {
 		<div style="display:flex; align-items:center; flex-firection:column; gap:16px">
 			for _, user := range props.Users {
-				<div style="display:flex;flex-direction:column;gap:2px" onClick={ onUserIDSelect(props.UserIDSelectedURL + fmt.Sprint(user.ID)) }>
-					<p>{ user.Name }</p>
-					<p>{ user.Email }</p>
-				</div>
+				<a
+					href={ templ.SafeURL(props.UserIDSelectedURL + fmt.Sprint(user.ID)) }
+					style="display:flex;flex-direction:column; justify-content:center; margin-bottom: 10px; cursor:pointer"
+				>
+					<p style="margin:0">{ user.Name }</p>
+					<p style="margin:0">{ user.Email }</p>
+				</a>
 			}
 		</div>
 		<a href={ templ.SafeURL(props.LoginEndpoint) }>Account Not Listed here? Login</a>
@@ -84,13 +96,22 @@ type ConsentScreenScope struct {
 }
 
 type ConsentScreenProps struct {
-	Client models.Client
-	Scopes []ConsentScreenScope
+	Client          models.Client
+	Scopes          []ConsentScreenScope
+	AllowConsentUrl string
+	DenyConsentUrl  string
+}
+
+script handleConsent(url string) {
+	window.location.href = url
 }
 
 templ ConsentScreen(props ConsentScreenProps) {
 	@cardContainer(props.Client) {
-		<h3 style="text-align:center">{ props.Client.AppName } would like to access the following from your account</h3>
+		<p style="text-align:center">
+			<strong>{ props.Client.AppName }</strong>&nbsp;
+			would like to access the following from your account
+		</p>
 		for _, scope := range props.Scopes {
 			<div style="display:flex; align-items:center; flex-direction:column; gap:5px; margin-bottom: 16px">
 				<p>{ scope.Name }</p>
@@ -100,6 +121,10 @@ templ ConsentScreen(props ConsentScreenProps) {
 			</div>
 		}
 		<h3 style="text-align:center">Do you allow ?</h3>
+		<div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:16px; width:100%">
+			<fluent-button onClick={ handleConsent(props.DenyConsentUrl) }>Cancel</fluent-button>
+			<fluent-button onClick={ handleConsent(props.AllowConsentUrl) } appearance="accent">Allow</fluent-button>
+		</div>
 	}
 }
 

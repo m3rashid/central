@@ -3,6 +3,7 @@ package handlers
 import (
 	"errors"
 	"internal/helpers"
+	"log"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -18,8 +19,9 @@ func RenderLoginScreen(ctx *fiber.Ctx) error {
 		return errorComponent(ctx, models.Client{}, errors.New("client not found"))
 	}
 
-	return components.LoginOrRegister(components.LoginProps{
+	return components.LoginOrRegister(components.LoginOrRegisterProps{
 		IsRegister:         false,
+		FlowQueryString:    setUrlWithFlowQueries("", flowQueries),
 		LoginEndpoint:      setUrlWithFlowQueries("/login", flowQueries),
 		RegisterEndpoint:   setUrlWithFlowQueries("/register", flowQueries),
 		SelectUserEndpoint: setUrlWithFlowQueries("/select-user", flowQueries),
@@ -65,5 +67,6 @@ func HandleLogin(ctx *fiber.Ctx) error {
 	}
 
 	addUserIDToCookie(ctx, user.ID)
+	log.Println(flowQueries)
 	return ctx.Redirect(setUrlWithFlowQueries("/select-user", flowQueries))
 }
