@@ -4,12 +4,10 @@ RUN go install github.com/cosmtrek/air@latest
 RUN go install github.com/a-h/templ/cmd/templ@latest
 
 WORKDIR /app
-RUN mkdir contacts internal
 
-COPY internal/go.mod ./internal/go.sum ./internal/
+COPY . .
+
 RUN cd internal && go mod download && cd ..
-COPY ./internal ./internal
+RUN cd contacts && go mod download && templ generate && cd ..
 
-COPY ./contacts/go.mod ./contacts/go.sum ./contacts/
-RUN cd contacts && go mod download && cd ..
-COPY ./contacts ./contacts
+WORKDIR /app/contacts

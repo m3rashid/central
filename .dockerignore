@@ -1,2 +1,13 @@
 tmp
 sample.env
+README.md
+.gitignore
+.vscode
+.idea
+.git
+
+.RData
+.Rhistory
+manifest.json
+rsconnect/
+.Rproj.user

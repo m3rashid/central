@@ -17,7 +17,7 @@ services:
       - ./internal:/app/internal
     ports:
       - 5000:5000
-    command: air
+    command: go run main.go
     depends_on:
       - database
 
@@ -33,7 +33,7 @@ services:
   #     - ./internal:/app/internal
   #   ports:
   #     - 5001:5001
-  #   command: cd contacts && air
+  #   command: go run main.go
   #   depends_on:
   #     - database
 
@@ -48,6 +48,7 @@ services:
       - 5432:5432
     volumes:
       - ./data/postgresDb:/var/lib/postgresql/data
+      - ./pg-init-scripts:/docker-entrypoint-initdb.d
     depends_on:
       - redis
 
