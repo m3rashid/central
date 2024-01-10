@@ -76,13 +76,8 @@ func PingResourceServers() {
 				break
 			}
 
-			currentResourceServerDetails, resourceServerExists := resourceServerDetailsMap[name]
-			if resourceServerExists {
-				currentResourceServerDetails = resourceServerDetails
-			} else {
-				resourceServerDetailsMap[name] = resourceServerDetails
-			}
-			currentResourceServerDetails.LastUpdated = time.Now()
+			resourceServerDetails.LastUpdated = time.Now()
+			resourceServerDetailsMap[name] = resourceServerDetails
 		}
 	}
 }
