@@ -21,21 +21,21 @@ services:
     depends_on:
       - database
 
-  # contacts-webserver:
-  #   build:
-  #     context: .
-  #     dockerfile: contacts.Dockerfile
-  #   restart: always
-  #   env_file:
-  #     - ./contacts/.env
-  #   volumes:
-  #     - ./contacts:/app/contacts
-  #     - ./internal:/app/internal
-  #   ports:
-  #     - 5001:5001
-  #   command: go run main.go
-  #   depends_on:
-  #     - database
+  contacts-webserver:
+    build:
+      context: .
+      dockerfile: contacts.Dockerfile
+    restart: always
+    env_file:
+      - ./contacts/.env
+    volumes:
+      - ./contacts:/app/contacts
+      - ./internal:/app/internal
+    ports:
+      - 5001:5001
+    command: go run main.go
+    depends_on:
+      - database
 
   database:
     image: postgres:latest

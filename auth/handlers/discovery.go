@@ -2,16 +2,25 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"internal/discovery"
+	"internal/helpers"
 	"io"
+	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-var resourceDiscoveryUrls = map[string]string{
+var localResourceDiscoveryUrls = map[string]string{
 	"contacts": "http://localhost:5001/discovery",
+	// ...
+}
+
+var dockerResourceDiscoveryUrls = map[string]string{
+	"contacts": "http://contacts-webserver:5001/discovery",
 	// ...
 }
 
@@ -40,22 +49,31 @@ func DiscoverResourceServers(ctx *fiber.Ctx) error {
  */
 func PingResourceServers() {
 	timeTick := time.NewTicker(time.Second * 5)
+	serverEnvironment := os.Getenv("ENVIRONMENT")
+	resourceDiscoveryUrls := helpers.Ternary[map[string]string](
+		serverEnvironment == "docker",
+		dockerResourceDiscoveryUrls,
+		localResourceDiscoveryUrls,
+	)
 
 	for range timeTick.C {
 		for name, url := range resourceDiscoveryUrls {
+			log.Printf("Discovering %s server at %s", name, url)
 			response, err := http.Get(url)
 			if err != nil {
-				return
+				fmt.Printf("Error in getting response from %s server\n", name)
+				break
 			}
 
 			byteArr, err := io.ReadAll(response.Body)
 			if err != nil {
-				return
+				break
 			}
 
 			var resourceServerDetails discovery.ResourceServerDetails
 			if err := json.Unmarshal(byteArr, &resourceServerDetails); err != nil {
-				return
+				fmt.Printf("Error in parsing response from %s server\n", name)
+				break
 			}
 
 			currentResourceServerDetails, resourceServerExists := resourceServerDetailsMap[name]
@@ -65,7 +83,6 @@ func PingResourceServers() {
 				resourceServerDetailsMap[name] = resourceServerDetails
 			}
 			currentResourceServerDetails.LastUpdated = time.Now()
-			resourceDiscoveryUrls[name] = resourceServerDetails.BaseUrl + "/discovery"
 		}
 	}
 }

@@ -5,7 +5,7 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   bin = "./tmp/auth"
-  cmd = "templ generate && go build -o ./tmp/auth ."
+  cmd = "go build -o ./tmp/auth ."
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "clients", "bin", ".vscode", "public", "data"]
   exclude_file = []
