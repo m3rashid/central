@@ -86,6 +86,7 @@ func main() {
 	}
 	db.AutoMigrate(models.Models...)
 
+	// // Run this script to seed the database
 	// err = initialSeedDatabase()
 	// if err != nil {
 	// 	log.Fatal("database seeding failed")
