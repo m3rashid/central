@@ -18,7 +18,7 @@ var endpoints = discovery.ResourceServerDetails{
 			Description: "Get contact by ID",
 		},
 	},
-	Scopes: discovery.Scopes{
+	AllowedScopes: discovery.AllowedScopes{
 		"contacts": {"read", "create", "update", "delete"},
 	},
 }

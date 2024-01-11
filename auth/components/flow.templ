@@ -9,7 +9,7 @@ import (
 templ cardContainer (client models.Client) {
 	@rootHTML() {
 		<div class="all-center h-screen">
-			<div class="w-[320px] flex flex-col items-center justify-center p-8 h-min shadow-md rounded-md">
+			<div class="w-[320px] flex flex-col items-center justify-center p-8 h-min shadow-md rounded-md bg-white">
 				if client.AppLogoUrl != "" {
 					<img height="50px" width="50px" class="text-center" src={ client.AppLogoUrl } alt="app_logo"/>
 				}
@@ -66,7 +66,6 @@ templ LoginOrRegister (props LoginOrRegisterProps, client models.Client) {
 					ButtonText: "Login",
 					ButtonType: "submit",
 				})
-			<fluent-button appearance="accent" type="submit">Login</fluent-button>
 		</form>
 		if props.IsRegister {
 			<a class="text-center" href={ templ.SafeURL(props.LoginEndpoint) }>Account Not Listed here? Login</a>
@@ -116,14 +115,11 @@ templ FlowError (errors []string, client models.Client) {
 	}
 }
 
-type ConsentScreenScope struct {
-	Name        string
-	Permissions []string
-}
+type ConsentScreenScope map[string][]string
 
 type ConsentScreenProps struct {
 	Client          models.Client
-	Scopes          []ConsentScreenScope
+	Scopes          ConsentScreenScope
 	AllowConsentUrl string
 	DenyConsentUrl  string
 }
@@ -138,10 +134,10 @@ templ ConsentScreen(props ConsentScreenProps) {
 			<strong>{ props.Client.AppName }</strong>&nbsp;
 			would like to access the following from your account
 		</p>
-		for _, scope := range props.Scopes {
+		for modelName, scopes := range props.Scopes {
 			<div class="flex items-center flex-col gap-3 mb-8">
-				<p>{ scope.Name }</p>
-				for _, perm := range scope.Permissions {
+				<p>{ modelName }</p>
+				for _, perm := range scopes {
 					<p>{ perm }</p>
 				}
 			</div>
@@ -151,6 +147,7 @@ templ ConsentScreen(props ConsentScreenProps) {
 			@button(ButtonProps{
 					ButtonText: "Cancel",
 					onClick: handleConsent(props.DenyConsentUrl),
+					OtherStyles: "bg-gray-200 hover:bg-gray-300",
 				})
 			@button(ButtonProps{
 					ButtonText: "Allow",

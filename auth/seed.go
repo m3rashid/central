@@ -16,15 +16,6 @@ func initialSeedDatabase() error {
 		return err
 	}
 
-	// create default user
-	defaultUser := models.User{
-		Name:         "MD Rashid Hussain",
-		Email:        "m3rashid.hussain@gmail.com",
-		Password:     hashedPassword,
-		OTP:          helpers.GenerateOTP(),
-		UserVerified: true,
-	}
-
 	db, err := utils.GetDb()
 	if err != nil {
 		log.Println("Could not get database")
@@ -32,6 +23,14 @@ func initialSeedDatabase() error {
 	}
 
 	return db.Transaction(func(tx *gorm.DB) error {
+		defaultUser := models.User{
+			Name:         "MD Rashid Hussain",
+			Email:        "m3rashid.hussain@gmail.com",
+			Password:     hashedPassword,
+			OTP:          helpers.GenerateOTP(),
+			UserVerified: true,
+		}
+
 		if err := tx.Create(&defaultUser).Error; err != nil {
 			log.Println("Could not create user")
 			return err
@@ -40,7 +39,7 @@ func initialSeedDatabase() error {
 		client := models.Client{
 			ClientID:           "client-id",
 			ClientSecret:       "sample-client-secret",
-			Scopes:             "", // TODO
+			Scopes:             helpers.JSONB{"contacts": []string{"read", "create"}},
 			SuccessRedirectUri: "http://localhost:5001/success",
 			FailureRedirectUri: "http://localhost:5001/failure",
 			AppName:            "Campaigns",

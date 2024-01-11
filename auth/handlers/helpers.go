@@ -15,7 +15,7 @@ import (
 const stateQueryKey = "state"
 const clientIDQueryKey = "client_id"
 const responseTypeQueryKey = "response_type"
-const scopesQueryKey = "scopes"
+
 const consentQueryKey = "consent"
 
 const localUsersCookieName = "local_users"
@@ -30,13 +30,11 @@ type FlowQueries struct {
 	ClientID       string
 	ResponseType   string
 	State          string
-	Scopes         []string
 	SelectedUserID string
 }
 
 func getFlowQueries(ctx *fiber.Ctx) (FlowQueries, error) {
 	var flowQueries FlowQueries
-	scopes := ctx.Query(scopesQueryKey, "")
 	flowQueries.ClientID = ctx.Query(clientIDQueryKey, "")
 	flowQueries.ResponseType = ctx.Query(responseTypeQueryKey, "")
 	flowQueries.SelectedUserID = ctx.Query(selectedUserIDKey, "0")
@@ -45,7 +43,6 @@ func getFlowQueries(ctx *fiber.Ctx) (FlowQueries, error) {
 		return flowQueries, errors.New("client_id and/or response_type missing")
 	}
 
-	flowQueries.Scopes = append(flowQueries.Scopes, strings.Split(scopes, ",")...)
 	return flowQueries, nil
 }
 
@@ -127,23 +124,6 @@ func getClient(ctx *fiber.Ctx) (models.Client, FlowQueries, error) {
 		Preload("Scopes").Preload("Scopes.Permission").Error
 	if err != nil || client.ID == 0 {
 		return client, flowQueries, err
-	}
-
-	// check if the scopes asked for, is included in the registered scopes of the client
-	// get scopes from discovery
-	for _, registeredScope := range client.Scopes {
-		var scopeMatched = false
-		// TODO: make it granular -- also check the permission levels
-		for _, scope := range flowQueries.Scopes {
-			if scope == registeredScope.Name {
-				scopeMatched = true
-				break
-			}
-		}
-
-		if !scopeMatched {
-			return client, flowQueries, errors.New("invalid scope")
-		}
 	}
 
 	return client, flowQueries, nil

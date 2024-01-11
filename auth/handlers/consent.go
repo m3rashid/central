@@ -3,10 +3,12 @@ package handlers
 import (
 	"errors"
 	"internal/helpers"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/m3rashid/central/auth/components"
 	"github.com/m3rashid/central/auth/models"
+	"github.com/m3rashid/central/auth/utils"
 )
 
 func RenderConsentScreen(ctx *fiber.Ctx) error {
@@ -16,14 +18,11 @@ func RenderConsentScreen(ctx *fiber.Ctx) error {
 		return errorComponent(ctx, models.Client{}, errors.New("client not found"))
 	}
 
-	consentScreenScopes := []components.ConsentScreenScope{}
-	for _, scope := range client.Scopes {
-		newScope := components.ConsentScreenScope{Name: scope.Name, Permissions: []string{}}
-		// TODO: get scopes and permissions from discovery
-		for _, permission := range scope.Permissions {
-			newScope.Permissions = append(newScope.Permissions, permission.Name)
+	consentScreenScopes := components.ConsentScreenScope{}
+	for modelName, scopes := range client.Scopes {
+		for _, item := range scopes.([]interface{}) {
+			consentScreenScopes[modelName] = append(consentScreenScopes[modelName], item.(string))
 		}
-		consentScreenScopes = append(consentScreenScopes, newScope)
 	}
 
 	component := components.ConsentScreen(components.ConsentScreenProps{
@@ -38,14 +37,28 @@ func RenderConsentScreen(ctx *fiber.Ctx) error {
 func HandleConsent(ctx *fiber.Ctx) error {
 	ctx.Set("Content-Type", "text/html")
 	client, flowQueries, err := getClient(ctx)
-	if err != nil {
-		return errorComponent(ctx, models.Client{}, errors.New("client not found"))
+	if err != nil || flowQueries.SelectedUserID == "0" {
+		return errorComponent(ctx, models.Client{}, errors.New("client or user not found"))
 	}
 
 	consent := ctx.Query(consentQueryKey, "false")
 	if consent == "true" {
-		// TODO: add app to connected apps
-		return ctx.Redirect(client.SuccessRedirectUri + helpers.Ternary[string](flowQueries.State != "", "?"+stateQueryKey+"="+flowQueries.State, ""))
+		db, err := utils.GetDb()
+		if err != nil {
+			return errorComponent(ctx, models.Client{}, errors.New("unexpected error occured"))
+		}
+
+		u64, err := strconv.ParseUint(flowQueries.SelectedUserID, 10, 32)
+		if err != nil {
+			return errorComponent(ctx, models.Client{}, errors.New("unexpected error occured"))
+		}
+
+		db.Table(models.USER_TABLE_NAME).Where("id = ?", uint(u64)).Association("ConnectedApps").Append(&client)
+
+		return ctx.Redirect(
+			client.SuccessRedirectUri +
+				helpers.Ternary[string](flowQueries.State != "", "?"+stateQueryKey+"="+flowQueries.State, ""),
+		)
 	}
 	return ctx.Redirect(client.FailureRedirectUri)
 }
