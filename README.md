@@ -2,7 +2,7 @@
 
 Golang micro-services for the distributed architectures
 
-This project was created only to check the viability (POC) of the idea. It is not intended to be used in production.
+This project was created only to check the viability (POC) of the idea. It is not intended to be used in production. Checkout [Central V2](https://github.com/m3rashid/central-v2) for the full implementation.
 
 ---
 
