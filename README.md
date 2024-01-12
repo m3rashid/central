@@ -10,12 +10,7 @@ This project was created only to check the viability (POC) of the idea. It is no
 
 **How to run**
 
-1. with docker
-
-```bash
-docker-compose up -d
-```
-
+1. with docker, run `docker-compose up -d`
 2. without docker
    - install [golang](https://golang.org/doc/install), [postgres](https://www.postgresql.org/download/), [redis](https://redis.io/download), [air](github.com/cosmtrek/air@latest), [templ cli](github.com/a-h/templ/cmd/templ@latest)
    - put the required environment variables in the `sample.env` file into a `.env` file
