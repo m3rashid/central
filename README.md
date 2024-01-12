@@ -6,8 +6,6 @@ This project was created only to check the viability (POC) of the idea. It is no
 
 ---
 
-<br />
-
 **How to run**
 
 1. with docker, run `docker-compose up -d`
@@ -19,8 +17,6 @@ This project was created only to check the viability (POC) of the idea. It is no
    - run `cd campaigns && air`
 
 ---
-
-<br />
 
 **Objective**
 
