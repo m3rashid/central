@@ -1,5 +1,7 @@
 ### Central
 
+https://github.com/m3rashid/central/assets/64685317/7ae7ce50-45a7-485f-8b01-61a0f83d35dd
+
 Golang micro-services for the distributed architectures
 
 I was researching a lot about Google OAuth2, openID connect, scopes and permissions these days. Building this project, I learnt a lot about openID and OAuth2 and its importance and the security it gives, especially interacting with 3rd party services.
